@@ -14,7 +14,8 @@ $lines = @(
     '<table border="0">'
     '<tbody>'
     '<tr>'
-    "<td valign=`"top`"><a href=`"$appURL/releases/download/$tag/$(buildAssetName -Architecture x64)`"><img src=`"https://raw.githubusercontent.com/fosterbarnes/res/main/btn/x64Portable.svg`" width=`"180`" height=`"auto`" alt=`"Download Windows x64 portable ZIP`"/></a></td>"
+    "<td valign=`"top`"><a href=`"$appURL/releases/download/$tag/$(buildAssetName -Kind Installer -Architecture x64)`"><img src=`"https://raw.githubusercontent.com/fosterbarnes/res/main/btn/x64Installer.svg`" width=`"180`" height=`"auto`" alt=`"Download Windows x64 installer`"/></a></td>"
+    "<td valign=`"top`"><a href=`"$appURL/releases/download/$tag/$(buildAssetName -Kind Portable -Architecture x64)`"><img src=`"https://raw.githubusercontent.com/fosterbarnes/res/main/btn/x64Portable.svg`" width=`"180`" height=`"auto`" alt=`"Download Windows x64 portable ZIP`"/></a></td>"
     '</tr>'
     '</tbody>'
     '</table>'

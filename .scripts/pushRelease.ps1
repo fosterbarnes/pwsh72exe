@@ -1,9 +1,8 @@
 #requires -Version 7.0
+param([Alias('n')][switch]$DryRun)
 $ErrorActionPreference = 'Stop'
 . "$PSScriptRoot\scriptHelper.ps1"
 Set-Location -LiteralPath $repoRoot
-runNativeCommand git @('tag', '-f', $tag) 'git tag'
-runNativeCommand git @('push', 'origin', "refs/tags/$tag", '--force') 'git push tag'
 $assets = @(Get-ChildItem -LiteralPath $publishFolder -File)
 if (-not $assets) { throw "No release assets found in $publishFolder" }
 $assetArgs = @($assets | ForEach-Object FullName)
@@ -27,5 +26,16 @@ if (Test-Path -LiteralPath $buildNotes) {
 
 $releaseArgs = @('release', 'create', $tag, '--title', $releaseTitle, '--repo', $ghRepo)
 if ($releaseNotes) { $releaseArgs += @('--notes', $releaseNotes) } else { $releaseArgs += '--generate-notes' }
+$releaseUrl = "$appURL/releases/tag/$tag"
+if ($DryRun) {
+    Write-Host "Dry run: git tag -f $tag"
+    Write-Host "Dry run: git push origin refs/tags/$tag --force"
+    Write-Host "Dry run: gh $((($releaseArgs + $assetArgs) -join ' '))"
+    Write-Host "Dry run: open $releaseUrl"
+    return
+}
+runNativeCommand git @('tag', '-f', $tag) 'git tag'
+runNativeCommand git @('push', 'origin', "refs/tags/$tag", '--force') 'git push tag'
 runNativeCommand gh ($releaseArgs + $assetArgs) 'gh release create'
-closeOut 3
+openUrl $releaseUrl
+closeOut 0
