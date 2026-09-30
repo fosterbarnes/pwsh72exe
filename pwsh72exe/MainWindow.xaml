@@ -1,0 +1,224 @@
+<Window x:Class="pwsh72exe.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="pwsh72exe"
+        Width="720"
+        Height="500"
+        MinWidth="640"
+        MinHeight="460"
+        WindowStartupLocation="Manual"
+        Background="{StaticResource AppBackgroundBrush}"
+        Foreground="{StaticResource PrimaryTextBrush}"
+        Loaded="MainWindow_Loaded"
+        Closing="Window_Closing">
+    <Window.Resources>
+        <Geometry x:Key="FolderIcon">M2,4 L8,4 L10,6 L18,6 L18,16 L2,16 Z</Geometry>
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}" />
+        </Style>
+    </Window.Resources>
+    <Grid Margin="{StaticResource PageMargin}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TabControl x:Name="ModeTabs"
+                    Grid.Row="0"
+                    SelectionChanged="ModeTabs_SelectionChanged"
+                    SizeChanged="ModeTabs_SizeChanged">
+            <TabItem Header="Build" Tag="Build" />
+            <TabItem Header="About" Tag="About" />
+        </TabControl>
+        <Grid Grid.Row="1">
+            <Grid x:Name="BuildPage"
+                  Opacity="0"
+                  Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <Border Style="{StaticResource ContentPanelStyle}">
+                            <StackPanel>
+                                <Grid Margin="{StaticResource RowGap}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="{StaticResource LabelColumnWidth}" />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Script" />
+                                    <TextBox x:Name="ScriptBox" Grid.Column="1" Margin="{StaticResource FieldButtonGap}" />
+                                    <Button Grid.Column="2" Margin="0" Content="Browse..." Click="Script_Click" Style="{StaticResource NeutralButtonStyle}" />
+                                </Grid>
+                                <Grid Margin="{StaticResource RowGap}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="{StaticResource LabelColumnWidth}" />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Output" />
+                                    <TextBox x:Name="OutputBox" Grid.Column="1" Margin="{StaticResource FieldButtonGap}" IsReadOnly="True" />
+                                    <Button Grid.Column="2" Margin="0" Content="Folder..." Click="Output_Click" Style="{StaticResource NeutralButtonStyle}" />
+                                </Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="{StaticResource LabelColumnWidth}" />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Icon (.ico)" />
+                                    <TextBox x:Name="IconBox" Grid.Column="1" Margin="{StaticResource FieldButtonGap}" />
+                                    <Button Grid.Column="2" Margin="0" Content="Browse..." Click="Icon_Click" Style="{StaticResource NeutralButtonStyle}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                        <Border Margin="{StaticResource PanelGap}" Style="{StaticResource ContentPanelStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="{StaticResource LabelColumnWidth}" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Margin="{StaticResource RowGap}" Style="{StaticResource FieldLabelStyle}" Text="Output mode" />
+                                <ComboBox x:Name="ModeBox" Grid.Row="0" Grid.Column="1" Width="200" Margin="{StaticResource RowGap}" HorizontalAlignment="Left" SelectedIndex="1">
+                                    <ComboBoxItem Content="Shortcut (.lnk)" />
+                                    <ComboBoxItem Content="Portable EXE" />
+                                </ComboBox>
+                                <TextBlock Grid.Row="1" Margin="{StaticResource RowGap}" Style="{StaticResource FieldLabelStyle}" Text="Host" />
+                                <ComboBox x:Name="HostBox" Grid.Row="1" Grid.Column="1" Width="200" Margin="{StaticResource RowGap}" HorizontalAlignment="Left" SelectedIndex="1">
+                                    <ComboBoxItem Content="Windows PowerShell 5.1" />
+                                    <ComboBoxItem Content="PowerShell 7" />
+                                </ComboBox>
+                                <TextBlock Grid.Row="2" Margin="{StaticResource RowGap}" Style="{StaticResource FieldLabelStyle}" Text="Execution policy" />
+                                <ComboBox x:Name="PolicyBox" Grid.Row="2" Grid.Column="1" Width="200" Margin="{StaticResource RowGap}" HorizontalAlignment="Left" SelectedIndex="0">
+                                    <ComboBoxItem Content="Bypass" />
+                                    <ComboBoxItem Content="RemoteSigned" />
+                                    <ComboBoxItem Content="AllSigned" />
+                                    <ComboBoxItem Content="Restricted" />
+                                    <ComboBoxItem Content="Unrestricted" />
+                                </ComboBox>
+                                <TextBlock Grid.Row="3" Margin="{StaticResource RowGap}" Style="{StaticResource FieldLabelStyle}" Text="Flags" />
+                                <StackPanel Grid.Row="3" Grid.Column="1" Margin="{StaticResource RowGap}" Orientation="Horizontal">
+                                    <CheckBox x:Name="NoProfileBox" Margin="{StaticResource CheckBoxGap}" Content="-NoProfile" />
+                                    <CheckBox x:Name="NonInteractiveBox" Margin="{StaticResource CheckBoxGap}" Content="-NonInteractive" />
+                                    <CheckBox x:Name="HideHostBox" Content="Hide host window" />
+                                </StackPanel>
+                                <TextBlock Grid.Row="4" Style="{StaticResource FieldLabelStyle}" Text="Elevation" />
+                                <CheckBox x:Name="AdminBox" Grid.Row="4" Grid.Column="1" Content="Run as administrator (EXE only)" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+                <Grid Grid.Row="1" Margin="0,14,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="RunButton" Margin="0" Content="Run" Click="Run_Click" Style="{StaticResource NeutralButtonStyle}" />
+                    <TextBlock x:Name="StatusText"
+                               Grid.Column="1"
+                               Margin="12,0"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"
+                               Visibility="Collapsed" />
+                    <Button x:Name="BuildButton" Grid.Column="2" Margin="0" Padding="10,0" Width="{StaticResource NeutralButtonWidth}" Height="{StaticResource NeutralButtonHeight}" MinHeight="{StaticResource NeutralButtonHeight}" Content="Build" Click="Build_Click" />
+                </Grid>
+            </Grid>
+            <Border x:Name="AboutPage"
+                    Opacity="0"
+                    Visibility="Collapsed"
+                    Style="{StaticResource ContentPanelStyle}">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0"
+                           Width="128"
+                           Height="128"
+                           Margin="0,0,16,0"
+                           Source="/Resources/icon.png"
+                           Stretch="Uniform"
+                           SnapsToDevicePixels="True" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock x:Name="AboutTitleText"
+                                   FontSize="22"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource PrimaryTextBrush}" />
+                        <TextBlock x:Name="AboutVersionText"
+                                   Margin="0,2,0,10"
+                                   Foreground="{StaticResource SecondaryTextBrush}" />
+                        <TextBlock Margin="0,0,0,4">
+                            <Hyperlink Style="{StaticResource AboutHyperlinkStyle}"
+                                       NavigateUri="https://github.com/fosterbarnes/pwsh72exe"
+                                       RequestNavigate="AboutHyperlink_RequestNavigate">
+                                github.com/fosterbarnes/pwsh72exe
+                            </Hyperlink>
+                        </TextBlock>
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Margin="0,0,12,6" FontWeight="SemiBold" Text="Install:" />
+                            <TextBlock x:Name="AboutInstallPathText"
+                                       Grid.Column="1"
+                                       Margin="0,0,8,6"
+                                       Foreground="{StaticResource SecondaryTextBrush}"
+                                       TextWrapping="Wrap" />
+                            <Button Grid.Column="2"
+                                    Margin="0,0,0,6"
+                                    Style="{StaticResource AboutFolderButtonStyle}"
+                                    Click="AboutOpenInstallLocation_Click"
+                                    ToolTip="Open install location">
+                                <Path Width="18" Height="18" Data="{StaticResource FolderIcon}" Stretch="Uniform" Stroke="{StaticResource SecondaryTextBrush}" StrokeThickness="1.5" />
+                            </Button>
+                            <TextBlock Grid.Row="1" Margin="0,0,12,0" FontWeight="SemiBold" Text="Config:" />
+                            <TextBlock x:Name="AboutConfigPathText"
+                                       Grid.Row="1"
+                                       Grid.Column="1"
+                                       Margin="0,0,8,0"
+                                       Foreground="{StaticResource SecondaryTextBrush}"
+                                       TextWrapping="Wrap" />
+                            <Button Grid.Row="1"
+                                    Grid.Column="2"
+                                    Margin="0"
+                                    Style="{StaticResource AboutFolderButtonStyle}"
+                                    Click="AboutOpenInstallLocation_Click"
+                                    ToolTip="Open config location">
+                                <Path Width="18" Height="18" Data="{StaticResource FolderIcon}" Stretch="Uniform" Stroke="{StaticResource SecondaryTextBrush}" StrokeThickness="1.5" />
+                            </Button>
+                        </Grid>
+                        <StackPanel Style="{StaticResource AboutCreditLineStackPanelStyle}">
+                            <TextBlock Style="{StaticResource AboutCreditLinePartTextBlockStyle}">
+                                <Run Text="made with &lt;3 by " Foreground="{StaticResource SecondaryTextBrush}" />
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource AboutCreditLinePartTextBlockStyle}" Margin="0">
+                                <Hyperlink Style="{StaticResource AboutHyperlinkStyle}"
+                                           NavigateUri="https://github.com/fosterbarnes"
+                                           RequestNavigate="AboutHyperlink_RequestNavigate">
+                                    fosterbarnes
+                                </Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,22 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <Thickness x:Key="PageMargin">12</Thickness>
+    <Thickness x:Key="SegmentStripMargin">0,0,0,10</Thickness>
+    <Thickness x:Key="ContentPanelPadding">16</Thickness>
+    <Thickness x:Key="ControlMargin">0,0,8,0</Thickness>
+    <Thickness x:Key="TabPadding">8,6</Thickness>
+    <Thickness x:Key="TabDividerInset">0,4,0,4</Thickness>
+    <CornerRadius x:Key="SmallCornerRadius">3</CornerRadius>
+    <CornerRadius x:Key="PanelCornerRadius">4</CornerRadius>
+    <sys:Double x:Key="SegmentHeight">32</sys:Double>
+    <sys:Double x:Key="NeutralButtonWidth">92</sys:Double>
+    <sys:Double x:Key="NeutralButtonHeight">28</sys:Double>
+    <sys:Double x:Key="ControlMinHeight">32</sys:Double>
+    <sys:Double x:Key="FieldHeight">28</sys:Double>
+    <GridLength x:Key="LabelColumnWidth">120</GridLength>
+    <Thickness x:Key="RowGap">0,0,0,10</Thickness>
+    <Thickness x:Key="FieldButtonGap">0,0,8,0</Thickness>
+    <Thickness x:Key="CheckBoxGap">0,0,16,0</Thickness>
+    <Thickness x:Key="PanelGap">0,12,0,0</Thickness>
+</ResourceDictionary>
