@@ -5,7 +5,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <ApplicationIcon>..\.res\icon\icon.ico</ApplicationIcon>
+    <ApplicationIcon>..\..\.res\icon\icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\pwsh72exe.Core\pwsh72exe.Core.csproj" />

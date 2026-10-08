@@ -8,12 +8,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>pwsh72exe</RootNamespace>
     <AssemblyName>pwsh72exe.Gui</AssemblyName>
-    <ApplicationIcon>..\.res\icon\icon.ico</ApplicationIcon>
+    <ApplicationIcon>..\..\.res\icon\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="..\.res\icon\icon.png" Link="Resources\icon.png" />
-    <Content Include="..\.version\version" Link="Version" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
+    <Resource Include="..\..\.res\icon\icon.png" Link="Resources\icon.png" />
+    <Content Include="..\..\.version\version" Link="Version" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>

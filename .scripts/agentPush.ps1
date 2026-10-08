@@ -1,5 +1,5 @@
 #requires -Version 7.0
-# Non-interactive push for the agent-push skill: -Context prints what the agent needs to write
+# Non-interactive push for agents, run only when the user explicitly asks them to push: -Context prints what the agent needs to write
 # buildNotes.txt; the default mode validates it, runs prePush.ps1 and push.ps1 quietly, then reports.
 param([Alias('h')][switch]$Help, [switch]$Context)
 $ErrorActionPreference = 'Stop'

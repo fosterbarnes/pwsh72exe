@@ -9,6 +9,7 @@ $end = '<!-- End Quick Reference -->'
 $startIndex = $content.IndexOf($start, [StringComparison]::Ordinal)
 $endIndex = $content.IndexOf($end, [StringComparison]::Ordinal)
 if ($startIndex -lt 0 -or $endIndex -lt $startIndex) { throw 'README Quick Reference markers are missing.' }
+# One table row per asset kind, one button cell per build target.
 $rows = foreach ($kind in 'Installer', 'Portable') {
     $label = if ($kind -eq 'Installer') { 'installer' } else { 'portable ZIP' }
     '<tr>'

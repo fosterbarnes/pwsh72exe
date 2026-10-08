@@ -1,9 +1,11 @@
 bin/
 obj/
 publish/
+.config/
 .installer/Output/
+.version/versionBuild
+desktop.ini
+buildNotes.*
 *.user
 *.suo
 *.pdb
-*.md
-.version/versionBuild

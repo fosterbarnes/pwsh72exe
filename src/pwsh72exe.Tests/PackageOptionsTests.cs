@@ -213,12 +213,12 @@ public sealed class PackageOptionsTests
         try
         {
             File.WriteAllText(Path.Combine(directory.FullName, AppConfig.FileName),
-                "OutputPath=C:\\Users\\Foster\\Desktop\nIconPath=C:\\Users\\Foster\\icon.ico\nHidden=true\n");
+                "OutputPath=C:\\Users\\Example\\Desktop\nIconPath=C:\\Users\\Example\\icon.ico\nHidden=true\n");
 
             var config = AppConfig.Load(directory.FullName);
 
-            Assert.Equal(@"C:\Users\Foster\Desktop", config.OutputPath);
-            Assert.Equal(@"C:\Users\Foster\icon.ico", config.IconPath);
+            Assert.Equal(@"C:\Users\Example\Desktop", config.OutputPath);
+            Assert.Equal(@"C:\Users\Example\icon.ico", config.IconPath);
             Assert.True(config.Hidden);
         }
         finally
