@@ -11,6 +11,7 @@ $target = getBuildTargets ($architecture ?? 'x64')
 $forward = @($AppLaunchArgs | Where-Object { "$_" -notmatch '(?i)^(--x86|-x86|--86|-86|--x64|-x64|--64|-64|--arm64|-arm64|--arm|-arm)$' })
 $project = if ($Cli) { $cliProject } else { $guiProject }
 $framework = if ($Cli) { $dotnetFramework } else { $dotnetFrameworkGui }
+try {
 while ($true) {
     setVerBuild $target.Architecture
     $dotnetArgs = @('run', '--project', $project, '--framework', $framework, '-c', 'Release', "-p:Platform=$($target.Architecture)")
@@ -26,5 +27,13 @@ while ($true) {
         if ($key.Key -eq [ConsoleKey]::Q) { $action = 'quit'; break }
     }
     if ($action) { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue }
-    if ($action -ne 'restart') { break }
-}; closeOut 0
+    if ($action -ne 'restart') {
+        if (-not $action -and $proc.ExitCode -ne 0) { throw "$projectName exited with code $($proc.ExitCode)." }
+        break
+    }
+}
+} catch {
+    closeOut -KeepOpen
+    throw
+}
+closeOut 0

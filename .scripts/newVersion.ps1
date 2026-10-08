@@ -55,4 +55,4 @@ if (Test-Path -LiteralPath $buildNotes) {
     writeFileNoBom -LiteralPath $buildNotes -Content ((@("v$major.$minor.$patch release") + $tail) -join "`n")
 }
 Write-Host "Version -> $major.$minor.$patch" 
-closeOut 3
+closeOut 0

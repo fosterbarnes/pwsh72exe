@@ -26,4 +26,4 @@ foreach ($target in (getBuildTargets $targetArchitecture)) {
         if (-not (Test-Path -LiteralPath $exePath)) { throw "Missing publish output: $exePath" }
     }
     runNativeCommand $iscc (@($isccDefines) + $target.InstallerScript) "ISCC $($target.Architecture)"
-}; closeOut 3
+}; closeOut 0

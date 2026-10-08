@@ -9,19 +9,17 @@ $end = '<!-- End Quick Reference -->'
 $startIndex = $content.IndexOf($start, [StringComparison]::Ordinal)
 $endIndex = $content.IndexOf($end, [StringComparison]::Ordinal)
 if ($startIndex -lt 0 -or $endIndex -lt $startIndex) { throw 'README Quick Reference markers are missing.' }
-$lines = @(
-    $start
-    '<table border="0">'
-    '<tbody>'
+$rows = foreach ($kind in 'Installer', 'Portable') {
+    $label = if ($kind -eq 'Installer') { 'installer' } else { 'portable ZIP' }
     '<tr>'
-    "<td valign=`"top`"><a href=`"$appURL/releases/download/$tag/$(buildAssetName -Kind Installer -Architecture x64)`"><img src=`"https://raw.githubusercontent.com/fosterbarnes/res/main/btn/x64Installer.svg`" width=`"180`" height=`"auto`" alt=`"Download Windows x64 installer`"/></a></td>"
-    "<td valign=`"top`"><a href=`"$appURL/releases/download/$tag/$(buildAssetName -Kind Portable -Architecture x64)`"><img src=`"https://raw.githubusercontent.com/fosterbarnes/res/main/btn/x64Portable.svg`" width=`"180`" height=`"auto`" alt=`"Download Windows x64 portable ZIP`"/></a></td>"
+    foreach ($target in $buildTargets) {
+        $asset = "$appURL/releases/download/$tag/$(buildAssetName -Kind $kind -Architecture $target.Architecture)"
+        $button = "$buttonURL/$($target["${kind}Button"])"
+        "<td valign=`"top`"><a href=`"$asset`"><img src=`"$button`" width=`"180`" height=`"auto`" alt=`"Windows $($target.Architecture) $label`"/></a></td>"
+    }
     '</tr>'
-    '</tbody>'
-    '</table>'
-    ''
-    $end
-)
+}
+$lines = @($start; '<table border="0">'; '<tbody>'; $rows; '</tbody>'; '</table>'; $end)
 $prefix = $content.Substring(0, $startIndex) ; $suffix = $content.Substring($endIndex + $end.Length)
 writeFileNoBom -LiteralPath $readme -Content ($prefix + ($lines -join "`n") + $suffix)
-closeOut 3
+closeOut 0

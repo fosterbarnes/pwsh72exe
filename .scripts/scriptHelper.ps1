@@ -32,8 +32,9 @@ $ghRepo = "$appPublisher/$projectName"
 $versionContents = ([IO.File]::ReadAllText($version)).Trim()
 $versionTagContents = if (Test-Path -LiteralPath $versionTag) { ([IO.File]::ReadAllText($versionTag)).Trim() } else { '' }
 $tag = if ($versionTagContents) { $versionTagContents } else { "v$versionContents" }
+$buttonURL = 'https://raw.githubusercontent.com/fosterbarnes/res/main/btn'
 $buildTargets = @(
-    @{ Architecture = 'x64'; RuntimeIdentifier = 'win-x64'; BinFolder = "$publishFolder\build\x64"; CliExePath = "$publishFolder\build\x64\$cliExeName"; GuiExePath = "$publishFolder\build\x64\$guiExeName"; InstallerName = "$projectName-x64-installer.exe"; InstallerScript = "$installerFolder\$projectName.x64.installer.iss" }
+    @{ Architecture = 'x64'; RuntimeIdentifier = 'win-x64'; BinFolder = "$publishFolder\build\x64"; CliExePath = "$publishFolder\build\x64\$cliExeName"; GuiExePath = "$publishFolder\build\x64\$guiExeName"; InstallerName = "$projectName-x64-installer.exe"; InstallerScript = "$installerFolder\$projectName.x64.installer.iss"; InstallerButton = 'x64Installer.svg'; PortableButton = 'x64Portable.svg' }
 )
 $noBom = New-Object System.Text.UTF8Encoding $false
 $weztermExe = (Get-Command wezterm.exe -ErrorAction SilentlyContinue)?.Source
@@ -120,7 +121,18 @@ function writeClearedLine {
 }
 
 function closeOut {
-    param([int]$Seconds = 5)
+    param([int]$Seconds = 5, [switch]$KeepOpen)
+    if ($KeepOpen) { return }
+    if ($env:BASE_BUILD_PIPELINE) { return }
+    if ($Seconds -lt 0) { $Seconds = 0 }
+    if ($Seconds -gt 0) {
+        $pad = "closing after $Seconds seconds..."
+        foreach ($n in $Seconds..1) {
+            writeClearedLine -Text "closing after $n seconds..." -PadWidth $pad.Length -NoNewline
+            Start-Sleep -Seconds 1
+        }
+        writeClearedLine -Text 'closing...' -PadWidth $pad.Length
+    }
     $caller = $MyInvocation.PSCommandPath
     if ([string]::IsNullOrWhiteSpace($caller)) { return }
     $argv = [Environment]::GetCommandLineArgs()
@@ -137,15 +149,6 @@ function closeOut {
         $callerFull = [IO.Path]::GetFullPath($caller)
     } catch { return }
     if (-not [string]::Equals($fileFull, $callerFull, [StringComparison]::OrdinalIgnoreCase)) { return }
-    if ($Seconds -lt 0) { $Seconds = 0 }
-    if ($Seconds -gt 0) {
-        $pad = "closing after $Seconds seconds..."
-        foreach ($n in $Seconds..1) {
-            writeClearedLine -Text "closing after $n seconds..." -PadWidth $pad.Length -NoNewline
-            Start-Sleep -Seconds 1
-        }
-        writeClearedLine -Text 'closing...' -PadWidth $pad.Length
-    }
     try {
         if ($env:SCRIPT_OWN_PANE -and $env:WEZTERM_PANE -and $weztermExe) { & $weztermExe @('cli', 'kill-pane', '--pane-id', $env:WEZTERM_PANE) }
     } catch { }
@@ -195,15 +198,22 @@ function buildAssetName {
 
 function buildAll {
     param([string]$Architecture)
-    $params = @{}; if ($Architecture) { $params.Architecture = $Architecture }
-    runNativeCommand -FilePath "$PSScriptRoot\build.ps1" -ArgumentList $params -Name 'build.ps1'
-    runNativeCommand -FilePath "$PSScriptRoot\buildInstaller.ps1" -ArgumentList $params -Name 'buildInstaller.ps1'
-    New-Item -ItemType Directory -Path $publishFolder -Force | Out-Null
-    foreach ($target in (getBuildTargets $Architecture)) {
-        Compress-Archive -Path "$($target.BinFolder)\*" -DestinationPath "$publishFolder\$(buildAssetName -Kind Portable -Architecture $target.Architecture)" -Force
-        Copy-Item -LiteralPath "$installerOutput\$($target.InstallerName)" -Destination "$publishFolder\$(buildAssetName -Kind Installer -Architecture $target.Architecture)" -Force
+    $previousPipeline = $env:BASE_BUILD_PIPELINE
+    try {
+        $env:BASE_BUILD_PIPELINE = '1'
+        deleteDir $publishFolder
+        $params = @{}; if ($Architecture) { $params.Architecture = $Architecture }
+        runNativeCommand -FilePath "$PSScriptRoot\build.ps1" -ArgumentList $params -Name 'build.ps1'
+        runNativeCommand -FilePath "$PSScriptRoot\buildInstaller.ps1" -ArgumentList $params -Name 'buildInstaller.ps1'
+        New-Item -ItemType Directory -Path $publishFolder -Force | Out-Null
+        foreach ($target in (getBuildTargets $Architecture)) {
+            Compress-Archive -Path "$($target.BinFolder)\*" -DestinationPath "$publishFolder\$(buildAssetName -Kind Portable -Architecture $target.Architecture)" -Force
+            Copy-Item -LiteralPath "$installerOutput\$($target.InstallerName)" -Destination "$publishFolder\$(buildAssetName -Kind Installer -Architecture $target.Architecture)" -Force
+        }
+        runNativeCommand -FilePath "$PSScriptRoot\updateReadme.ps1" -ArgumentList @{} -Name 'updateReadme.ps1'
+    } finally {
+        $env:BASE_BUILD_PIPELINE = $previousPipeline
     }
-    runNativeCommand -FilePath "$PSScriptRoot\updateReadme.ps1" -ArgumentList @{} -Name 'updateReadme.ps1'
 }
 
 Set-Location -LiteralPath $repoRoot

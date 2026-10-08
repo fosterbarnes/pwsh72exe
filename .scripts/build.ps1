@@ -1,7 +1,6 @@
 #requires -Version 7.0
 param([Alias('h')][switch]$Help, [string]$Architecture)
 $ErrorActionPreference = 'Stop'
-trap { Write-Error -ErrorRecord $_; exit 1 }
 if ($Help) { Write-Host 'build.ps1 [-x86|-x64|-arm64]'; return }
 . "$PSScriptRoot\scriptHelper.ps1"
 Write-Host "=== building $projectName... ==="
@@ -29,4 +28,4 @@ foreach ($target in $targets) {
         if (Test-Path -LiteralPath $temp) { Remove-Item -LiteralPath $temp -Recurse -Force }
     }
 }
-closeOut 3
+closeOut 0
